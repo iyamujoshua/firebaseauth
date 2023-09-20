@@ -1,9 +1,28 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebaseauth/features/user_auth/firebase/firebase_services.dart';
 import 'package:firebaseauth/features/user_auth/presentation/widgets/form_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class Signup extends StatelessWidget {
+class Signup extends StatefulWidget {
   const Signup({super.key});
+
+  @override
+  State<Signup> createState() => _SignupState();
+}
+
+class _SignupState extends State<Signup> {
+  final FirebaseAuthService _auth = FirebaseAuthService();
+  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +35,7 @@ class Signup extends StatelessWidget {
             children: [
               Text('Signup'),
               FormContainerWidget(
+                controller: _usernameController,
                 hintText: "Username",
                 isPasswordField: false,
               ),
@@ -23,6 +43,7 @@ class Signup extends StatelessWidget {
                 height: 10,
               ),
               FormContainerWidget(
+                controller: _emailController,
                 hintText: "Email",
                 isPasswordField: false,
               ),
@@ -30,6 +51,7 @@ class Signup extends StatelessWidget {
                 height: 10,
               ),
               FormContainerWidget(
+                controller: _passwordController,
                 hintText: "password",
                 isPasswordField: true,
               ),
@@ -37,7 +59,7 @@ class Signup extends StatelessWidget {
                 height: 20,
               ),
               GestureDetector(
-                onTap: () {},
+                onTap:_signUp,
                 child: Container(
                   width: double.infinity,
                   height: 50,
@@ -78,5 +100,19 @@ class Signup extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _signUp() async {
+    String username = _usernameController.text;
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    User? user = await _auth.signUpWithEmailAndPassword(email, password);
+    if (user != null) {
+      print("user Logged in successful");
+      Navigator.pushNamed(context, '/Homepage');
+    } else {
+      print("It means there is an error");
+    }
   }
 }
